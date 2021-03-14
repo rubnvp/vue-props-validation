@@ -83,7 +83,7 @@ function validateProp(name, value, prop, isAbsent) {
     return true;
 }
 
-function objectValidator(options) {
+export function objectValidator(options) {
     return (rawValues) => {
         if (!isObject(rawValues)) return false;
         for (const key in options) {
@@ -100,7 +100,7 @@ function objectValidator(options) {
     }
 }
 
-function arrayValidator(opt) {
+export function arrayValidator(opt) {
     return (rawValues) => {
         if (!isArray(rawValues)) return false;
         if (!isObject(opt) || isArray(opt)) {
@@ -110,43 +110,43 @@ function arrayValidator(opt) {
     }
 }
 
-console.assert(
-    objectValidator({
-        name: String,
-        age: Number,
-        animal: {
-            type: Object,
-            validator: objectValidator({
-                id: [Number, String],
-            })
-        }
-    })({
-        name: 'Chili',
-        age: 1,
-        animal: {
-            id: 2
-        }
-    })
-);
+// console.assert(
+//     objectValidator({
+//         name: String,
+//         age: Number,
+//         animal: {
+//             type: Object,
+//             validator: objectValidator({
+//                 id: [Number, String],
+//             })
+//         }
+//     })({
+//         name: 'Chili',
+//         age: 1,
+//         animal: {
+//             id: 2
+//         }
+//     })
+// );
 
-console.assert(
-    arrayValidator(Number)([1, 2, 3])
-)
+// console.assert(
+//     arrayValidator(Number)([1, 2, 3])
+// )
 
-console.assert(
-    arrayValidator({
-        type: [String, Number],
-        validator: value => value.includes('@'),
-    })(['hola@gmail.com', 'hola2@gmail.com', 'ruben@'])
-)
+// console.assert(
+//     arrayValidator({
+//         type: [String, Number],
+//         validator: value => value.includes('@'),
+//     })(['hola@gmail.com', 'hola2@gmail.com', 'ruben@'])
+// )
 
-console.assert(
-    arrayValidator({
-        type: Object,
-        validator: objectValidator({
-            id: Number,
-            name: String,
-            isCat: Boolean,
-        }),
-    })([{id: 1, name: 'chili', isCat: true}, {id: 2, name: 'Peppers', isCat: false}])
-)
+// console.assert(
+//     arrayValidator({
+//         type: Object,
+//         validator: objectValidator({
+//             id: Number,
+//             name: String,
+//             isCat: Boolean,
+//         }),
+//     })([{id: 1, name: 'chili', isCat: true}, {id: 2, name: 'Peppers', isCat: false}])
+// )
