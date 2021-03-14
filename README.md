@@ -64,7 +64,7 @@ props: {
 }
 ```
 
-### API response validation
+### API response validation example
 ```js
 import {arrayValidator, objectValidator} from 'vue-props-validation';
 
