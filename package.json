@@ -15,8 +15,12 @@
     "vue",
     "vuejs",
     "props",
+    "prop",
     "validation",
-    "validator"
+    "validator",
+    "object",
+    "array",
+    "helper"
   ],
   "author": "Rubén Valseca",
   "license": "MIT",
