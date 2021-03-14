@@ -15,10 +15,17 @@ describe('objectValidator', () => {
     expect(objectValidator({value: String})({value: 'string'})).toBe(true);
     expect(objectValidator({value: Number})({value: 123})).toBe(true);
     expect(objectValidator({value: Boolean})({value: false})).toBe(true);
+    expect(objectValidator({value: Object})({value: {val: 1}})).toBe(true);
+    expect(objectValidator({value: Array})({value: [1, 2]})).toBe(true);
     expect(objectValidator({value: Function})({value: function(){return 'fun'}})).toBe(true);
     expect(objectValidator({value: Symbol})({value: Symbol('foo')})).toBe(true);
     expect(objectValidator({value: BigInt})({value: BigInt("9007199254740991")})).toBe(true);
     expect(objectValidator({value: Date})({value: new Date()})).toBe(true);
+    function Person (firstName, lastName) {
+      this.firstName = firstName
+      this.lastName = lastName
+    }
+    expect(objectValidator({value: new Person('John', 'Doe')})({value: Person})).toBe(true);
   })/
 
   test('required object attribute', () => {
