@@ -10,7 +10,7 @@ npm install vue-props-validation
 ## Usage
 You can write validations for object attributes and array elements in the Vue syntax way (without `default`). You can also validate any other object or array outside vue props.
 
-### Objects validator
+### Objects validation
 ```js
 import {objectValidator} from 'vue-props-validation';
 
@@ -28,7 +28,7 @@ props: {
 }
 ```
 
-### Arrays validator
+### Arrays validation
 ```js
 import {arrayValidator} from 'vue-props-validation';
 
