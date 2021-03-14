@@ -33,11 +33,17 @@ props: {
 import {arrayValidator} from 'vue-props-validation';
 
 props: {
-  names: arrayValidator(String),
-  emails: arrayValidator({
-    type: String,
-    validator: email => email.includes('@'),
-  }),
+  names: {
+    type: Array,
+    validator: arrayValidator(String),
+  },
+  emails: {
+    type: Array,
+    validator: arrayValidator({
+      type: String,
+      validator: email => email.includes('@'),
+    }),
+  },
 }
 ```
 
@@ -47,20 +53,23 @@ You can nest validators as much as you want.
 import {arrayValidator, objectValidator} from 'vue-props-validation';
 
 props: {
-  animals: arrayValidator({
-    type: Object,
-    validator: objectValidator({
-      id: [String, Number],
-      name: String,
-      age: Number,
-      isCat: Boolean,
-      vaccinationDates: {
-        type: Array,
-        required: false,
-        validator: arrayValidator([Date, String, Number]),
-      }
+  animals: {
+    type: Array,
+    validator: arrayValidator({
+      type: Object,
+      validator: objectValidator({
+        id: [String, Number],
+        name: String,
+        age: Number,
+        isCat: Boolean,
+        vaccinationDates: {
+          type: Array,
+          required: false,
+          validator: arrayValidator([Date, String, Number]),
+        }
+      }),
     }),
-  }),
+  },
 }
 ```
 
