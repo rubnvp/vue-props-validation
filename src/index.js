@@ -1,32 +1,32 @@
 /** Object validator */
 
 export function objectValidator(options) {
-    return (rawValues) => {
-        if (!isObject(rawValues)) return false
-        for (const key in options) {
-        let opt = options[key]
-        if (opt == null) continue
-        if (!isObject(opt) || isArray(opt)) {
-            opt = { type: opt, required: true }
-        }
-        if (!validateProp(key, rawValues[key], opt, !hasOwn(rawValues, key))) {
-            return false
-        }
-        }
-        return true
+  return (rawValues) => {
+    if (!isObject(rawValues)) return false
+    for (const key in options) {
+      let opt = options[key]
+      if (opt == null) continue
+      if (!isObject(opt) || isArray(opt)) {
+        opt = { type: opt, required: true }
+      }
+      if (!validateProp(key, rawValues[key], opt, !hasOwn(rawValues, key))) {
+        return false
+      }
     }
+    return true
+  }
 }
 
 /** Array validator */
 
 export function arrayValidator(opt) {
-    return (rawValues) => {
-        if (!isArray(rawValues)) return false
-        if (!isObject(opt) || isArray(opt)) {
-        opt = { type: opt, required: true }
-        }
-        return rawValues.every((element, i) => validateProp(i, element, opt, false))
+  return (rawValues) => {
+    if (!isArray(rawValues)) return false
+    if (!isObject(opt) || isArray(opt)) {
+      opt = { type: opt, required: true }
     }
+    return rawValues.every((element, i) => validateProp(i, element, opt, false))
+  }
 }
 
 /** Code from vue-next repository: https://github.com/vuejs/vue-next/blob/1a955e22785cd3fea32b80aa58049c09bba4e321/packages/runtime-core/src/componentProps.ts#L476 */
