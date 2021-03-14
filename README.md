@@ -78,7 +78,7 @@ fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons
           name: String,
           types: Array,
         }),
-      });
+      })(pokemons);
       if (!isValid) console.error('invalid pokemons response');
   });
 ```
