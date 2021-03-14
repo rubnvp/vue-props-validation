@@ -4,7 +4,8 @@
   "description": "Vue props validation logic extracted for nested validation in object and arrays.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "babel index.js -d lib"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
   },
   "homepage": "https://github.com/rubnvp/vue-props-validation#readme",
   "devDependencies": {
+    "@babel/cli": "^7.13.10",
     "@babel/core": "^7.13.10",
+    "@babel/plugin-transform-modules-umd": "^7.13.0",
     "@babel/preset-env": "^7.13.10",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3"

@@ -1,4 +1,4 @@
-import {objectValidator, arrayValidator} from '../index';
+import {objectValidator, arrayValidator} from './index';
 
 describe('objectValidator', () => {
 
