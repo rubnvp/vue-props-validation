@@ -8,7 +8,7 @@ npm install vue-props-validation
 ```
 
 ## Usage
-You can write validations for object attributes and array elements in the Vue syntax way. You can also validate any other object or array outside vue props.
+You can write validations for object attributes and array elements in the Vue syntax way (without `default`). You can also validate any other object or array outside vue props.
 
 ### Objects validator
 ```js
@@ -57,9 +57,28 @@ props: {
       vaccinationDates: {
         type: Array,
         required: false,
-        validator: arrayValidator([String, Number]),
+        validator: arrayValidator([Date, String, Number]),
       }
     }),
   }),
 }
+```
+
+### API response validation
+```js
+import {arrayValidator, objectValidator} from 'vue-props-validation';
+
+fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons.json') 
+  .then(response => response.json())
+  .then(pokemons => {
+      const isValid = arrayValidator({
+        type: Object,
+        validator: objectValidator({
+          id: Number,
+          name: String,
+          types: Array,
+        }),
+      });
+      if (!isValid) console.error('invalid pokemons response');
+  });
 ```
