@@ -8,9 +8,7 @@ npm install vue-props-validation
 ```
 
 ## Usage
-You can write validations for object attributes and array elements in the Vue syntax way (without `default`). You can also validate any other object or array outside vue props.
-
-The type can be any native or custom constructor: String, Number, Boolean, Array, Object, Date, Function, Symbol, BigInt...
+You can write validations for object attributes and array elements in the Vue syntax way (vue validators are not executed in production). You can also validate any other object or array outside vue props.
 
 ### Objects validation
 ```js
@@ -93,3 +91,11 @@ fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons
       if (!isValid) console.error('invalid pokemons response');
   });
 ```
+
+## Notes
+Like in Vue, the type can be any native or custom constructor: String, Number, Boolean, Array, Object, Date, Function, Symbol, BigInt, etc. ⚠️  The attribute `default` is not supported in order to avoid mutating props.
+
+## Todo roadmap
+- Detailed messages of why the validation fails with log level option.
+- Option for global or local flags to skip validation in production mode (like Vue props).
+- Include a plugin to avoid imports on every component.
