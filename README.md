@@ -92,11 +92,10 @@ fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons
   });
 ```
 
-## Usage from <script>
+## Usage from script tag
 You can point to unpkg.com. An object called VueProps with the functions will be added to the global scope.
 ```html
 <script src="https://unpkg.com/vue-props-validation"></script>
-<!-- with version: <script src="https://unpkg.com/vue-props-validation@0.0.6/lib/index.js"></script> -->
 ```
 
 ## Notes
