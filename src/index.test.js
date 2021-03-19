@@ -1,6 +1,16 @@
 import { expect, test } from '@jest/globals';
 import {objectValidator, arrayValidator} from './index';
 
+// create a function into global context for Jest
+global.console = {
+  warn: jest.fn(),
+  error: jest.fn(),
+};
+
+afterEach(() => {
+  Object.values(global.console).forEach(fn => fn.mockClear())
+})
+
 describe('objectValidator', () => {
 
   test('valid object attribute', () => {
@@ -9,6 +19,8 @@ describe('objectValidator', () => {
 
   test('invalid object attribute', () => {
     expect(objectValidator({ name: String })({ name: 123 })).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: type check failed for prop "name". Expected String with value "123", got Number with value 123.')
   })
 
   test('native constructors', () => {
@@ -34,6 +46,8 @@ describe('objectValidator', () => {
         name: {type: String, required: true}
       })({ id: 'Peppers' })
     ).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Missing required prop: "name"')
   })
 
   test('non required object attribute', () => {
@@ -57,6 +71,8 @@ describe('objectValidator', () => {
     expect(
       validator({ id: false })
     ).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: type check failed for prop "id". Expected Number, String, got Boolean with value false.')
   })
 
   test('custom validator', () => {
@@ -68,6 +84,8 @@ describe('objectValidator', () => {
     });
     expect(validator({ email: 'hello@google.com' })).toBe(true);
     expect(validator({ email: 'not an email' })).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: custom validator check failed for prop "email".')
   })
 
   test('nested object validator', () => {
@@ -92,6 +110,10 @@ describe('objectValidator', () => {
         id: ['_id_'],
       },
     })).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: type check failed for prop "id". Expected Number, String, got Array')
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: custom validator check failed for prop "animal".')
   })
 })
 
@@ -103,11 +125,15 @@ describe('arrayValidator', () => {
 
   test('invalid array', () => {
     expect(arrayValidator(Number)([1, '2', 3])).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid element: type check failed for element 1. Expected Number with value 2, got String with value "2".')
   })
 
   test('multiple types array', () => {
     expect(arrayValidator([Number, String])([1, '2', 3])).toBe(true);
     expect(arrayValidator([Number, String])([1, '2', {}])).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid element: type check failed for element 2. Expected Number, String, got Object')
   })
 
   test('element custom validator', () => {
@@ -117,6 +143,8 @@ describe('arrayValidator', () => {
     });
     expect(validator([21, 35, 100])).toBe(true);
     expect(validator([21, 17, 100])).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid element: custom validator check failed for element 1.')
   })
 })
 
@@ -139,5 +167,9 @@ describe('object and array validators together', () => {
       {id: 1, name: 'chili', isCat: true},
       {id: 2, name: 'Peppers', isCat: 'yes'},
     ])).toBe(false);
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid prop: type check failed for prop "isCat". Expected Boolean, got String with value "yes".')
+    expect(global.console.warn)
+      .toHaveBeenCalledWith('[VueProps] Invalid element: custom validator check failed for element 1.')
   })
 })

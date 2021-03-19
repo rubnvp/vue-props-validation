@@ -53,12 +53,17 @@ export function arrayValidator(opt) {
 
 /** Logging */
 
-function warn(fnName, message) {
+function warn(message) {
   const logLevel = config.logLevel;
   if (logLevel === 'none') return;
-  message =`[VueProps]: ${fnName}. ${message}`;
+  message =`[VueProps] ${message}`;
   if (logLevel === 'throw') throw new Error(message);
   console[logLevel](message);
+}
+
+const fnPropName = {
+  'objectValidator': 'prop',
+  'arrayValidator': 'element',
 }
 
 /** Code from vue-next repository: https://github.com/vuejs/vue-next/blob/1a955e22785cd3fea32b80aa58049c09bba4e321/packages/runtime-core/src/componentProps.ts#L476 */
@@ -67,7 +72,7 @@ function validateProp(name, value, prop, isAbsent, fnName) {
   const { type, required, validator } = prop
   // required!
   if (required && isAbsent) {
-    warn(fnName, 'Missing required prop: "' + name + '"')
+    warn('Missing required prop: "' + name + '"')
     return false
   }
   // missing but optional
@@ -86,13 +91,14 @@ function validateProp(name, value, prop, isAbsent, fnName) {
       isValid = valid
     }
     if (!isValid) {
-      warn(fnName, getInvalidTypeMessage(name, value, expectedTypes))
+      warn(getInvalidTypeMessage(name, value, expectedTypes, fnName))
       return false
     }
   }
   // custom validator
   if (validator && !validator(value)) {
-    warn(fnName, 'Invalid prop: custom validator check failed for prop "' + name + '".')
+    const propName = fnName === 'objectValidator' ? `"${name}"` : name;
+    warn(`Invalid ${fnPropName[fnName]}: custom validator check failed for ${fnPropName[fnName]} ${propName}.`)
     return false
   }
   return true
@@ -147,9 +153,10 @@ const hasOwn = (val, key) => hasOwnProperty.call(val, key)
 const isObject = (val) => val !== null && typeof val === 'object'
 const isArray = Array.isArray
 
-function getInvalidTypeMessage(name, value, expectedTypes) {
+function getInvalidTypeMessage(name, value, expectedTypes, fnName) {
+  const propName = fnName === 'objectValidator' ? `"${name}"` : name;
   let message =
-    `Invalid prop: type check failed for prop "${name}".` +
+    `Invalid ${fnPropName[fnName]}: type check failed for ${fnPropName[fnName]} ${propName}.` +
     ` Expected ${expectedTypes.map(capitalize).join(', ')}`
   const expectedType = expectedTypes[0]
   const receivedType = toRawType(value)
@@ -163,17 +170,13 @@ function getInvalidTypeMessage(name, value, expectedTypes) {
   ) {
     message += ` with value ${expectedValue}`
   }
-  message += `, got ${receivedType} `
+  message += `, got ${receivedType}`
   // check if we need to specify received value
   if (isExplicable(receivedType)) {
-    message += `with value ${receivedValue}.`
+    message += ` with value ${receivedValue}.`
   }
   return message
 }
-
-const capitalize = cacheStringFunction(
-  (str) => str.charAt(0).toUpperCase() + str.slice(1)
-)
 
 const cacheStringFunction = (fn) => {
   const cache = Object.create(null)
@@ -182,6 +185,10 @@ const cacheStringFunction = (fn) => {
     return hit || (cache[str] = fn(str))
   })
 }
+
+const capitalize = cacheStringFunction(
+  (str) => str.charAt(0).toUpperCase() + str.slice(1)
+)
 
 const toRawType = (value) => {
   // extract "RawType" from strings like "[object RawType]"
