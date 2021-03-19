@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import {objectValidator, arrayValidator} from './index';
+import {objectValidator, arrayValidator, setConfig} from './index';
 
 // create a function into global context for Jest
 global.console = {
@@ -8,7 +8,8 @@ global.console = {
 };
 
 afterEach(() => {
-  Object.values(global.console).forEach(fn => fn.mockClear())
+  Object.values(global.console).forEach(fn => fn.mockClear()) // reset mocks
+  setConfig({enabled: true, logLevel: 'warn'}) // reset default global config
 })
 
 describe('objectValidator', () => {
@@ -171,5 +172,21 @@ describe('object and array validators together', () => {
       .toHaveBeenCalledWith('[VueProps] Invalid prop: type check failed for prop "isCat". Expected Boolean, got String with value "yes".')
     expect(global.console.warn)
       .toHaveBeenCalledWith('[VueProps] Invalid element: custom validator check failed for element 1.')
+  })
+})
+
+describe('config', () => {
+
+  test('if disabled then should pass even invalid validations', () => {
+    setConfig({enabled: false})
+    expect(objectValidator({ name: String })({ name: 123 })).toBe(true);
+    expect(arrayValidator(Number)([1, '2', 3])).toBe(true);
+  })
+
+  test('change log level to console.error', () => {
+    setConfig({logLevel: 'error'});
+    arrayValidator(Number)([1, '2', 3]);
+    expect(global.console.error)
+      .toHaveBeenCalledWith('[VueProps] Invalid element: type check failed for element 1. Expected Number with value 2, got String with value "2".')
   })
 })
