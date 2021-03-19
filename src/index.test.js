@@ -26,7 +26,7 @@ describe('objectValidator', () => {
       this.lastName = lastName
     }
     expect(objectValidator({value: new Person('John', 'Doe')})({value: Person})).toBe(true);
-  })/
+  })
 
   test('required object attribute', () => {
     expect(

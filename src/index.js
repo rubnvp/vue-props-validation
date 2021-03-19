@@ -1,7 +1,28 @@
+/** Config */
+
+const config = {
+  enabled: true,
+  logLevel: 'warn',
+};
+const logLevels = ['none', 'warn', 'error', 'throw'];
+
+export function setConfig({enabled, logLevel}) {
+  if (enabled != null) {
+    config.enabled = Boolean(enabled);
+  }
+  if (logLevel != null)  {
+    if (!logLevels.includes(logLevel)) {
+      throw new Error(`Invalid log level: ${logLevel}, specify one of these: ${logLevels.join()}`)
+    }
+    config.logLevel = logLevel;
+  }
+}
+
 /** Object validator */
 
 export function objectValidator(options) {
   return (rawValues) => {
+    if (!config.enabled) return true // skip validations if disabled
     if (!isObject(rawValues)) return false
     for (const key in options) {
       let opt = options[key]
@@ -9,7 +30,7 @@ export function objectValidator(options) {
       if (!isObject(opt) || isArray(opt)) {
         opt = { type: opt, required: true }
       }
-      if (!validateProp(key, rawValues[key], opt, !hasOwn(rawValues, key))) {
+      if (!validateProp(key, rawValues[key], opt, !hasOwn(rawValues, key), 'objectValidator')) {
         return false
       }
     }
@@ -21,21 +42,32 @@ export function objectValidator(options) {
 
 export function arrayValidator(opt) {
   return (rawValues) => {
+    if (!config.enabled) return true // skip validations if disabled
     if (!isArray(rawValues)) return false
     if (!isObject(opt) || isArray(opt)) {
       opt = { type: opt, required: true }
     }
-    return rawValues.every((element, i) => validateProp(i, element, opt, false))
+    return rawValues.every((element, i) => validateProp(i, element, opt, false, 'arrayValidator'))
   }
+}
+
+/** Logging */
+
+function warn(fnName, message) {
+  const logLevel = config.logLevel;
+  if (logLevel === 'none') return;
+  message =`[VueProps]: ${fnName}. ${message}`;
+  if (logLevel === 'throw') throw new Error(message);
+  console[logLevel](message);
 }
 
 /** Code from vue-next repository: https://github.com/vuejs/vue-next/blob/1a955e22785cd3fea32b80aa58049c09bba4e321/packages/runtime-core/src/componentProps.ts#L476 */
 
-function validateProp(name, value, prop, isAbsent) {
+function validateProp(name, value, prop, isAbsent, fnName) {
   const { type, required, validator } = prop
   // required!
   if (required && isAbsent) {
-    //   console.warn('Missing required prop: "' + name + '"')
+    warn(fnName, 'Missing required prop: "' + name + '"')
     return false
   }
   // missing but optional
@@ -46,21 +78,21 @@ function validateProp(name, value, prop, isAbsent) {
   if (type != null && type !== true) {
     let isValid = false
     const types = isArray(type) ? type : [type]
-    // const expectedTypes = []
+    const expectedTypes = []
     // value is valid as long as one of the specified types match
     for (let i = 0; i < types.length && !isValid; i++) {
       const { valid, expectedType } = assertType(value, types[i])
-      // expectedTypes.push(expectedType || '')
+      expectedTypes.push(expectedType || '')
       isValid = valid
     }
     if (!isValid) {
-      // console.warn(getInvalidTypeMessage(name, value, expectedTypes))
+      warn(fnName, getInvalidTypeMessage(name, value, expectedTypes))
       return false
     }
   }
   // custom validator
   if (validator && !validator(value)) {
-    // warn('Invalid prop: custom validator check failed for prop "' + name + '".')
+    warn(fnName, 'Invalid prop: custom validator check failed for prop "' + name + '".')
     return false
   }
   return true
@@ -114,3 +146,68 @@ const hasOwn = (val, key) => hasOwnProperty.call(val, key)
 
 const isObject = (val) => val !== null && typeof val === 'object'
 const isArray = Array.isArray
+
+function getInvalidTypeMessage(name, value, expectedTypes) {
+  let message =
+    `Invalid prop: type check failed for prop "${name}".` +
+    ` Expected ${expectedTypes.map(capitalize).join(', ')}`
+  const expectedType = expectedTypes[0]
+  const receivedType = toRawType(value)
+  const expectedValue = styleValue(value, expectedType)
+  const receivedValue = styleValue(value, receivedType)
+  // check if we need to specify expected value
+  if (
+    expectedTypes.length === 1 &&
+    isExplicable(expectedType) &&
+    !isBoolean(expectedType, receivedType)
+  ) {
+    message += ` with value ${expectedValue}`
+  }
+  message += `, got ${receivedType} `
+  // check if we need to specify received value
+  if (isExplicable(receivedType)) {
+    message += `with value ${receivedValue}.`
+  }
+  return message
+}
+
+const capitalize = cacheStringFunction(
+  (str) => str.charAt(0).toUpperCase() + str.slice(1)
+)
+
+const cacheStringFunction = (fn) => {
+  const cache = Object.create(null)
+  return ((str) => {
+    const hit = cache[str]
+    return hit || (cache[str] = fn(str))
+  })
+}
+
+const toRawType = (value) => {
+  // extract "RawType" from strings like "[object RawType]"
+  return toTypeString(value).slice(8, -1)
+}
+
+const toTypeString = (value) =>
+  objectToString.call(value)
+
+const objectToString = Object.prototype.toString
+
+function styleValue(value, type) {
+  if (type === 'String') {
+    return `"${value}"`
+  } else if (type === 'Number') {
+    return `${Number(value)}`
+  } else {
+    return `${value}`
+  }
+}
+
+function isExplicable(type) {
+  const explicitTypes = ['string', 'number', 'boolean']
+  return explicitTypes.some(elem => type.toLowerCase() === elem)
+}
+
+function isBoolean(...args) {
+  return args.some(elem => elem.toLowerCase() === 'boolean')
+}
