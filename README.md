@@ -101,11 +101,11 @@ import {setConfig} from 'vue-props-validation';
 setConfig({enabled: process.env.NODE_ENV !== 'production'});
 ```
 ### logLevel
-Choose the log level for validation message errors between:
-- 'none': no logs
-- 'warn': logs with console.warn
-- 'error': logs with console.error (by default)
-- 'throw': logs in exceptions
+Also you can choose the log level for validation message errors between:
+- `none`: no logs
+- `warn`: logs with console.warn
+- `error`: logs with console.error (by default)
+- `throw`: logs in exceptions
 ```js
 // at main.js
 import {setConfig} from 'vue-props-validation';
