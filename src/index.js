@@ -2,7 +2,7 @@
 
 const config = {
   enabled: true,
-  logLevel: 'warn',
+  logLevel: 'error',
 };
 const logLevels = ['none', 'warn', 'error', 'throw'];
 
@@ -53,7 +53,7 @@ export function arrayValidator(opt) {
 
 /** Logging */
 
-function warn(message) {
+function log(message) {
   const logLevel = config.logLevel;
   if (logLevel === 'none') return;
   message =`[VueProps] ${message}`;
@@ -72,7 +72,7 @@ function validateProp(name, value, prop, isAbsent, fnName) {
   const { type, required, validator } = prop
   // required!
   if (required && isAbsent) {
-    warn('Missing required prop: "' + name + '"')
+    log('Missing required prop: "' + name + '"')
     return false
   }
   // missing but optional
@@ -91,14 +91,14 @@ function validateProp(name, value, prop, isAbsent, fnName) {
       isValid = valid
     }
     if (!isValid) {
-      warn(getInvalidTypeMessage(name, value, expectedTypes, fnName))
+      log(getInvalidTypeMessage(name, value, expectedTypes, fnName))
       return false
     }
   }
   // custom validator
   if (validator && !validator(value)) {
     const propName = fnName === 'objectValidator' ? `"${name}"` : name;
-    warn(`Invalid ${fnPropName[fnName]}: custom validator check failed for ${fnPropName[fnName]} ${propName}.`)
+    log(`Invalid ${fnPropName[fnName]}: custom validator check failed for ${fnPropName[fnName]} ${propName}.`)
     return false
   }
   return true

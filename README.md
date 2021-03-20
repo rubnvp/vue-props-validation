@@ -8,7 +8,7 @@ npm install vue-props-validation
 ```
 
 ## Usage
-You can write validations for object attributes and array elements in the Vue syntax way (vue validators are not executed in production). You can also validate any other object or array outside vue props.
+You can write validations for object attributes and array elements in the Vue syntax way using the validator attribute. You can also validate any other object or array outside vue props.
 
 ### Objects validation
 ```js
@@ -80,7 +80,7 @@ import {arrayValidator, objectValidator} from 'vue-props-validation';
 fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons.json') 
   .then(response => response.json())
   .then(pokemons => {
-      const isValid = arrayValidator({
+      arrayValidator({ // this will log an error to the console if it fails
         type: Object,
         validator: objectValidator({
           id: Number,
@@ -88,7 +88,6 @@ fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons
           types: Array,
         }),
       })(pokemons);
-      if (!isValid) console.error('invalid pokemons response');
   });
 ```
 
@@ -98,10 +97,31 @@ You can point to unpkg.com. An object called VueProps with the functions will be
 <script src="https://unpkg.com/vue-props-validation"></script>
 ```
 
+## Config
+### enabled
+You can enable or disable all validators in order to skip validations in production enviroments and avoid possible performance issues:
+```js
+// at main.js
+import {setConfig} from 'vue-props-validation';
+
+setConfig({enabled: process.env.NODE_ENV !== 'production'});
+```
+### logLevel
+Choose the log level for validation message errors between:
+- 'none': no logs
+- 'warn': logs with console.warn
+- 'error': logs with console.error (by default)
+- 'throw': logs in exceptions
+```js
+// at main.js
+import {setConfig} from 'vue-props-validation';
+
+setConfig({logLevel: 'warn'});
+```
+
 ## Notes
-Like in Vue, the type can be any native or custom constructor: String, Number, Boolean, Array, Object, Date, Function, Symbol, BigInt, etc. ⚠️  The attribute `default` is not supported in order to avoid mutating props.
+ Remember that vue validators are not executed in production enviroments. Like in Vue, the type can be any native or custom constructor: String, Number, Boolean, Array, Object, Date, Function, Symbol, BigInt, etc. The attribute `default` is not supported in order to avoid mutating props.
 
 ## Todo roadmap
-- Detailed messages of why the validation fails with log level option.
-- Option for global or local flags to skip validation in production mode (like Vue props).
+- Option for local config to overwrite global config.
 - Include a plugin to avoid imports on every component.
