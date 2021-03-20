@@ -91,12 +91,6 @@ fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons
   });
 ```
 
-## Usage from script tag
-You can point to unpkg.com. An object called VueProps with the functions will be added to the global scope.
-```html
-<script src="https://unpkg.com/vue-props-validation"></script>
-```
-
 ## Config
 ### enabled
 You can enable or disable all validators in order to skip validations in production enviroments and avoid possible performance issues:
@@ -117,6 +111,12 @@ Choose the log level for validation message errors between:
 import {setConfig} from 'vue-props-validation';
 
 setConfig({logLevel: 'warn'});
+```
+
+## Usage from script tag
+You can point to unpkg.com. An object called VueProps with the functions will be added to the global scope.
+```html
+<script src="https://unpkg.com/vue-props-validation"></script>
 ```
 
 ## Notes
