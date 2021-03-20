@@ -80,7 +80,7 @@ import {arrayValidator, objectValidator} from 'vue-props-validation';
 fetch('https://raw.githubusercontent.com/rubnvp/vue-pokedex/master/data/pokemons.json') 
   .then(response => response.json())
   .then(pokemons => {
-      arrayValidator({ // this will return false log an error to the console if it fails
+      arrayValidator({ // this will return false and log an error to the console if it fails
         type: Object,
         validator: objectValidator({
           id: Number,
